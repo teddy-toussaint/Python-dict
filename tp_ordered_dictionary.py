@@ -4,13 +4,14 @@ dictionary
 @author: ttoussaint
 '''
 
-class OrderedDictionary():
+# Ordered dictionary
+class OrderedDictionary:
 
     # Constructor
     def __init__(self, *args, **kwargs):
         # Attributes
-        self.keys = []
-        self.vals = []
+        self.ks = []
+        self.vs = []
         
         # 1 argument => it's a dictionary
         if len(args) == 1:
@@ -21,30 +22,31 @@ class OrderedDictionary():
             for k, v in dict(kwargs).items():
                 self.add(k, v)
     
-    # Representation
+    # Representation : displays as "{key1: val1, key2: val2, ...}"
     def __repr__(self):
         res = str()
-        if len(self.keys) == 0:
-            res = "Empty dictionary\n"
+        if len(self.ks) == 0:
+            res = "{}"
         else:
-            my_len = len(self.keys)
+            my_len = len(self.ks)
             res = "{"
-            res = res + "{}: {}, ".format(self.keys[0], self.vals[0])
+            res += "{}: {}, ".format(self.ks[0], self.vs[0])
             for i in range(1, my_len-1):
-                res = res +"{}: {}, ".format(self.keys[i], self.vals[i])
-            res = res + "{}: {}".format(self.keys[my_len-1], self.vals[my_len-1])
-            res = res + "}.\n"
+                res += "{}: {}, ".format(self.ks[i], self.vs[i])
+            res += "{}: {}".format(self.ks[my_len-1],
+                                   self.vs[my_len-1])
+            res += "}"
         return res
     
     # Item getter
     def __getitem__(self, key):
-        return self.vals[self.i_finder(key)]
+        return self.vs[self.i_finder(key)]
     
     # Delete item
     def __delitem__(self, key):
         i = self.i_finder(key)
-        del self.keys[i]
-        del self.vals[i]
+        del self.ks[i]
+        del self.vs[i]
     
     # Item setter
     def __setitem__(self, key, val):
@@ -52,11 +54,11 @@ class OrderedDictionary():
         if i == -1:
             self.add(key, val)
         else:
-            self.vals[i] = val
+            self.vs[i] = val
     # Tuple adder
     def add(self, key, val):
-        self.keys.append(key)
-        self.vals.append(val)
+        self.ks.append(key)
+        self.vs.append(val)
         
     # Check content
     def __contains__(self, key):
@@ -68,54 +70,90 @@ class OrderedDictionary():
     
     # Length
     def __len__(self):
-        return len(self.keys)
+        return len(self.ks)
     
-    ## Sorting
+    # Iteration
+    def __iter__(self):
+        return OrderedDictionaryIterator(self)
+    
+    # Adds 2 ordered dictionary together
+    def __add__(self, dico):
+        res = OrderedDictionary()
+        # Adds the 1st one to the result
+        for t1 in self.items():
+            res.add(t1[0], t1[1])
+        # Adds the 2nd one to the result
+        for t2 in dico.items():
+            res.add(t2[0], t2[1])
+        return res
+    
+    # Sorts according to the keys
     def sort(self):
         resK = []
         resV = []
-        my_len = len(self.keys)
-        mini = self.keys[0]
+        my_len = len(self.ks)
+        mini = self.ks[0]
         for j in range(my_len):
             for i in range(my_len):
-                if (self.keys[i] < mini) and (self.keys[i] not in resK):
-                    mini = self.keys[i]
+                if (self.ks[i] < mini) and (self.ks[i] not in resK):
+                    mini = self.ks[i]
             resK.append(mini)
-            resV.append(self.vals[(self.i_finder(mini))])
-            #change value of 'mini'
+            resV.append(self.vs[(self.i_finder(mini))])
             for i in range(my_len):
-                if self.keys[i] != mini:
-                    mini = self.keys[i]
-                    print(mini)
+                if (self.ks[i] != mini) and (self.ks[i] not in resK):
+                    mini = self.ks[i]
                     break
-        self.keys = resK
-        self.vals = resV
+        self.ks = resK
+        self.vs = resV
         
-    ## Reversing
+    # Reverses the order of the keys
     def reverse(self):
         resK = []
         resV = []
-        my_len = len(self.keys)
+        my_len = len(self.ks)
         for i in range(my_len):
-            resK.append(self.keys[my_len-1-i])
-            resV.append(self.vals[my_len-1-i])
-        self.keys = resK
-        self.vals = resV
+            resK.append(self.ks[my_len-1-i])
+            resV.append(self.vs[my_len-1-i])
+        self.ks = resK
+        self.vs = resV
+        
+    # Returns the keys
+    def keys(self):
+        return self.ks
+        
+    # Returns the values
+    def values(self):
+        return self.vs
+        
+    # Returns both the keys and the values as tuples
+    def items(self):
+        res = []
+        for i in range(len(self.ks)):
+            # Creates the i'th tuple and adds it to the list
+            t = self.ks[i], self.vs[i]
+            res.append(t)
+        return res
     
     # Index finder
     def i_finder(self, key):
-        if key in self.keys:
-            for t in enumerate(self.keys):
+        if key in self.ks:
+            for t in enumerate(self.ks):
                 if t[1] == key:
                     return t[0]
         else:
             return -1
-    
-x = OrderedDictionary()
-y = OrderedDictionary({0:"lol", 5:"mdr", 3:"XD", 4:"haha"})
-z = OrderedDictionary(a = 18, b = 23, d = 38, g = 27, z = 42, f = 98, v = 37)
-print(x, y, z)
 
-# TEST
-z.sort()
-print(x, y, z)
+# Iterator for the ordered dictionary
+class OrderedDictionaryIterator:
+    
+    def __init__(self, ord_dict):
+        self.ord_dict = ord_dict
+        self.index = 0
+        return
+    
+    def __next__(self):
+        i = self.index
+        if i == len(self.ord_dict):
+            raise StopIteration
+        self.index += 1
+        return self.ord_dict.ks[i]
