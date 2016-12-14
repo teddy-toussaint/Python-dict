@@ -62,11 +62,7 @@ class OrderedDictionary:
         
     # Check content
     def __contains__(self, key):
-        i = self.i_finder(key)
-        if i == -1:
-            return False
-        else:
-            return True
+        return key in self.ks
     
     # Length
     def __len__(self):
@@ -74,7 +70,7 @@ class OrderedDictionary:
     
     # Iteration
     def __iter__(self):
-        return OrderedDictionaryIterator(self)
+        return iter(self.ks)
     
     # Adds 2 ordered dictionary together
     def __add__(self, dico):
@@ -142,18 +138,3 @@ class OrderedDictionary:
                     return t[0]
         else:
             return -1
-
-# Iterator for the ordered dictionary
-class OrderedDictionaryIterator:
-    
-    def __init__(self, ord_dict):
-        self.ord_dict = ord_dict
-        self.index = 0
-        return
-    
-    def __next__(self):
-        i = self.index
-        if i == len(self.ord_dict):
-            raise StopIteration
-        self.index += 1
-        return self.ord_dict.ks[i]
