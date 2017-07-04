@@ -1,7 +1,7 @@
 '''
 Created on December 12th 2016
-dictionary 
-@author: ttoussaint
+Ordered Dictionary 
+@author: ttous
 '''
 
 # Ordered dictionary
